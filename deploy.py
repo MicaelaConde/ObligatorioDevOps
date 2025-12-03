@@ -130,7 +130,7 @@ print(f"Endpoint RDS: {DB_ENDPOINT}")
 # Crear EC2 con UserData que genera archivo .env con credenciales de RDS
 user_data = '''#!/bin/bash
 sudo yum update -y
-sudo yum install -y httpd mysql -y
+sudo yum install -y httpd -y
 sudo systemctl start httpd
 sudo systemctl enable httpd
 
