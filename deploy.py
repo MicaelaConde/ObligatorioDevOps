@@ -140,7 +140,9 @@ echo "DB_USER={DB_USER}" >> /home/ec2-user/.env
 echo "DB_PASSWORD={DB_PASSWORD}" >> /home/ec2-user/.env
 echo "DB_PORT=3306" >> /home/ec2-user/.env
 
-echo "¡Sitio personalizado con conexión a RDS!" > /var/www/html/index.html
+aws s3 cp s3://{BUCKET_NAME}/{ARTIFACT_NAME} /var/www/html/app.zip
+unzip /var/www/html/app.zip -d /var/www/html/
+echo "Aplicación RH desplegada correctamente" > /var/www/html/index.html
 '''
 print("\n *** Creando instancia EC2 ***")
 response = ec2.run_instances(
