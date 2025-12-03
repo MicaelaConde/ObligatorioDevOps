@@ -49,3 +49,56 @@ except ClientError as e:
     else:
     	raise e
 
+# Subir archivo al busket
+print("Subiendo archivo al bucket")
+try:
+    s3.upload_file(ARTIFACT_PATH, BUCKET_NAME, ARTIFACT_NAME)
+    print("Archivo subido correctamente")
+except FileNotFoundError:
+    raise Exception(f"ERROR: No se encontró el archivo {ARTIFACT_PATH}")
+
+# Crear Security Group
+print("\n=== Creando Security Group ===")
+SG_NAME = "rhapp-web-sg"
+
+try:
+    sg = ec2.create_security_group(
+        GroupName=SG_NAME,
+        Description="SG para app RH"
+    )
+    SG_ID = sg["GroupId"]
+
+    ec2.authorize_security_group_ingress(
+        GroupId=SG_ID,
+        IpPermissions=[
+            {
+             	"IpProtocol": "tcp",
+                "FromPort": 22,
+                "ToPort": 22,
+                "IpRanges": [{"CidrIp": "0.0.0.0/0"}]
+            },
+            {
+             	"IpProtocol": "tcp",
+                "FromPort": 80,
+                "ToPort": 80,
+                "IpRanges": [{"CidrIp": "0.0.0.0/0"}]
+            },
+            {
+             	"IpProtocol": "tcp",
+                "FromPort": 3306,
+                "ToPort": 3306,
+                "UserIdGroupPairs": [{"GroupId": SG_ID}]
+            }
+	]
+    )
+    print(f"Security Group creado: {SG_ID}")
+
+except ClientError as e:
+    if "InvalidGroup.Duplicate" in str(e):
+        SG_ID = ec2.describe_security_groups(
+            GroupNames=[SG_NAME])["SecurityGroups"][0]["GroupId"]
+        print(f"SG ya existente: {SG_ID}")
+else:
+	raise e
+
+
