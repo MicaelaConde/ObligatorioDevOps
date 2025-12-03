@@ -24,3 +24,16 @@ DB_NAME = "demo_db"
 DB_USER = "admin"
 DB_SECRET_NAME = "secretpassword"
 
+# Obtener password desde Secrets Manager
+print("Obteniendo passwd desde AWS Secrets Manager")
+try:
+    response = secrets.get_secret_value(SecretId=DB_SECRET_NAME)
+    secret_dict = json.loads(response["SecretString"])
+    DB_PASSWORD = secret_dict["password"]
+
+except ClientError:
+    raise Exception(
+        f"ERROR: No se pudo obtener el secreto {DB_SECRET_NAME}. "
+        "Debe crearse en Secrets Manager"
+    )
+
