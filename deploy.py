@@ -37,3 +37,15 @@ except ClientError:
         "Debe crearse en Secrets Manager"
     )
 
+# Crear bucket S3
+print("\nCreando bucket s3")
+try:
+    s3.create_bucket(Bucket=BUCKET_NAME)
+    print(f"Bucket creado: {BUCKET_NAME}")
+
+except ClientError as e:
+    if "BucketAlreadyOwnedByYou" in str(e):
+        print(f"El bucket {BUCKET_NAME} ya existe.")
+    else:
+    	raise e
+
